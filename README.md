@@ -1,15 +1,19 @@
 # 🐶 Oxford IIIT Pet Dataset - Image Classification using PyTorch
 
-This project demonstrates how to use PyTorch and torchvision to classify pet images from the [Oxford-IIIT Pet Dataset](https://www.robots.ox.ac.uk/~vgg/data/pets/). The notebook walks through data loading, model creation, training, and evaluation.
+This project demonstrates how to use PyTorch and torchvision to classify pet images from the [Oxford-IIIT Pet Dataset](https://www.robots.ox.ac.uk/~vgg/data/pets/) using a deep learning model (ReXNet) with transfer learning. It includes data visualization, class balancing insight, training monitoring, and model explainability with Grad-CAM.
+
 
 ---
 
 ## 📁 Dataset
 
-- **Dataset**: Oxford-IIIT Pet Dataset (loaded using `torchvision.datasets.OxfordIIITPet`)
-- **Classes**: 37 pet breeds
-- **Format**: Images and segmentation masks
+We use the **Oxford-IIIT Pet Dataset**, which contains 37 categories (breeds of cats and dogs), with roughly 200 images for each class.
 
+- ✅ Training Set  
+- 🔍 Validation Set  
+- 🧪 Test Set  
+
+Data is split and preprocessed into PyTorch `DataLoader`s.
 ---
 
 ---
@@ -51,12 +55,33 @@ This project demonstrates how to use PyTorch and torchvision to classify pet ima
 
 
 
-3. **Model Definition & Training**  
-   - Building a CNN (or using a pre-trained model) for image classification.
-   - Training the model on the dataset.
+---
+## 🧠 Model Architecture
 
-4. **Evaluation**  
-   - Evaluating model performance with metrics and visualizations (loss curves, accuracy, etc.).
+We use **ReXNet v1.5**, a lightweight convolutional neural network optimized for efficiency and performance:
+
+- **Backbone**: `rexnet_150` (loaded from `timm`)
+- **Pretrained**: Yes (`imagenet`)
+- **Final Layer**: Modified to match the number of pet classes (`num_classes=37`)
+- **Loss**: `CrossEntropyLoss`
+- **Metrics**: Accuracy and `F1Score` (`torchmetrics.F1Score` with `multiclass`)
+
+---
+
+## 🎯 Training Strategy
+
+The training pipeline is built using a custom `TrainValidation` class:
+
+- **Optimizer**: `Adam` with learning rate = `3e-4`
+- **Scheduler**: `ReduceLROnPlateau` (monitors validation loss)
+- **Early Stopping**: Stops training if F1-score doesn’t improve for 3 epochs
+- **Epochs**: 25 (with early stopping)
+- **Best Model Saving**: Based on highest F1-Score on validation set
+- **Device**: GPU (`cuda`) or CPU fallback
+- **Dev Mode**: For debugging small runs with `dev_mode=True`
+
+
+
 
 ---
 
